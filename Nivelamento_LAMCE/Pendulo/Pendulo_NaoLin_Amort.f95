@@ -10,18 +10,18 @@ program test
     ! Parametros do Pendulo
     massa = 0.2
     tempo_Atual = 0.0
-    tempo_Total = 60.0
+    tempo_Total = 40.0
     xL = 0.8 
     grav = 9.81
     dt = 0.01
-    theta_0 = 7.0 !em Graus
+    theta_0 = 90.0 !em Graus
     omega_0 = 0.0 
     nsteps = tempo_Total / dt
     theta_0 = theta_0 * 3.1416 / 180 
     wl_2 = grav /xL
     wl = sqrt(wl_2)
 
-    qsi = 0.1
+    qsi = 0.15
     Alfa = qsi * wl
     Beta = qsi / wl
     C = Alfa
