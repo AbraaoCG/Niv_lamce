@@ -14,16 +14,16 @@ program test
     xL = 0.8 
     grav = 9.81
     dt = 0.01
-    theta_0 = 90.0 !em Graus
+    theta_0 = 7.0 !em Graus
     omega_0 = 0.0 
     nsteps = tempo_Total / dt
     theta_0 = theta_0 * 3.1416 / 180 
     wl_2 = grav /xL
     wl = sqrt(wl_2)
 
-    qsi = 0.15
-    Alfa = qsi * wl
-    Beta = qsi / wl
+    qsi = 0.10
+    Alfa = ( 2 * qsi ) * wl
+    Beta = (2 * qsi) / wl
     C = Alfa
     ! Execucao do algoritmo.
     theta = theta_0
