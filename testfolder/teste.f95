@@ -3,20 +3,21 @@
 program main
     implicit none (type, external)
     external :: sgesv
-    real     :: a(2, 2)  ! Matrix A.
-    real     :: b(2)     ! Vector b/x.
+    !real     :: a(2, 2)  ! Matrix A.
+    !real     :: b(2)     ! Vector b/x.
     real     :: pivot(2) ! Pivot indices (list of swap operations).
     integer  :: rc       ! Return code.
+    real*8   , allocatable :: A(:,:),b(:,:),x(:)
 	integer :: i,j
 	real :: Ma(3,3), MaT(3,3)
 
 	Ma = reshape ([1,2,3,4,5,6,7,8,9] , [3,3])
 
-    a = reshape([ 2., 3., 1., 1. ], [ 2, 2 ])
-    b = [ 5., 6. ]
+    !a = reshape([ 2., 3., 1., 1. ], [ 2, 2 ])
+    !b = [ 5., 6. ]
 
-    call sgesv(2, 1, a, 2, pivot, b, 2, rc)
-
+    !call sgesv(2, 1, a, 2, pivot, b, 2, rc)
+	open  (unit=1,file='dataset01.txt')
     if (rc /= 0) then
         print '(a, i0)', 'Error: ', rc
         stop
