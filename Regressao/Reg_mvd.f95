@@ -9,23 +9,24 @@ program RegRn
     real*8   , allocatable :: predictors(:,:),petr3(:,:),tpredictors(:,:),petr3_pred(:)
     real*8   , allocatable :: A(:,:),b(:,:),x(:)
     real*8  :: SQT, SQR, R2, R2adj, Yavg
-    character*20 header(13)
+    character*20 header(4)
 
+    
 !predictors é o conjunto de variáveis x1..xn ; tpredictors é a transposta
 !petr3 está ali pois será o y, enquanto petr3_pred guarda o resultado do modelo
     
-    open  (unit=1,file='dataset01.txt',form='formatted')
+    open  (unit=21,file='output22.txt',form='formatted')
     open  (unit=2,file='output.txt',form='formatted')
     
 
     nlines = 188       ! number of acquisitions from dataset.txt file
-    nvar   = 11        ! Number of predictors from dataset.txt file
+    nvar   = 3        ! Number of predictors from dataset.txt file
     
     neq    = nvar + 1  ! adding the bias coefficient
     
     
     
-    read (1,*) (header(i),i=1,13)
+    read (21,*) (header(i),i=1,4)
     
     
     !Inicializando matrizes e vetores
@@ -42,8 +43,8 @@ program RegRn
     allocate  (x(neq))     ; x(:) = 0.d0
     
     
-    rewind (1)
-    read (1,*)
+    rewind (21)
+    read (21,*)
     
     do i=1, nlines 
         predictors(i,0) = 1.d0 ! Bias coefficient

@@ -1,1 +1,0 @@
-gfortran -L/usr/lib -o example teste.f95 -llapack -lblas
