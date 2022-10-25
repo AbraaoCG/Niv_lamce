@@ -1,0 +1,10 @@
+# Scale font and line width (dpi) by changing the size! It will always display stretched.
+set terminal svg size 400,300 enhanced fname 'arial' size 10 but solid
+set output 'out.svg'
+
+# Key means label...
+set key inside bottom right
+set xlabel 'Aquisicoes'
+set ylabel 'Y (Petr3) / Y_Pred (Petr3 - Predicao)'
+set title 'Regressao Multivariada - Ibov & OIl --> Petr3 '
+plot  "output.txt" using 1:2 title 'Y' with p, "data.txt" using 1:3 title 'Y_Pred' with p
