@@ -1,0 +1,4 @@
+ Ponto - Grupo :            1           1
+ Ponto - Grupo :            2           1
+ Ponto - Grupo :            3           3
+ Ponto - Grupo :            4           2
