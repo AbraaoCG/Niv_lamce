@@ -27,9 +27,9 @@
     real*8  , allocatable   :: xMinimos(:), xMaximos(:)
     real*8  ,allocatable  ::  dados(:,:), centros(:,:),sumGroupXn(:,:)     ! dados(numPontos,numClusters)    
     
-    numGrupos=3
+    numGrupos=5
     numVariaveis=2
-    numPontos=4
+    numPontos=100
     
     allocate  ( agrupamento(1:numPontos))  ; agrupamento(:)  = 0.d0
     allocate  ( numPontosGrupo(1:numGrupos)) 
@@ -158,25 +158,37 @@
                 centros(i,j) = tmp
             enddo
         enddo
-
-        ! Se o algorítimo vai parar, então registrar grupamentos finais.
-        if (flag_mudanca == 0) then
-            do i = 1,numPontos
-                write(13,*) "Ponto - Grupo : " , i , agrupamento(i)
-            enddo
-        endif
         
     enddo
-
+    ! Abrir arquivos de saida de cada grupo.
+    open  (unit=21,file='grupo1.txt',form='formatted')
+    open  (unit=22,file='grupo2.txt',form='formatted')
+    open  (unit=23,file='grupo3.txt',form='formatted')
+    open  (unit=24,file='grupo4.txt',form='formatted')
+    open  (unit=25,file='grupo5.txt',form='formatted')
+    ! Registrar grupamentos finais gerar arquivos para plot de cada grupo.
+    if (flag_mudanca == 0) then
+        do i = 1,numPontos
+            write(13,*) "Ponto - Grupo : " , i , agrupamento(i)
+            itmp = agrupamento(i)
+            if (itmp == 1) then
+                write(21,*) ( dados(i,:) )
+            else if(itmp == 2) then
+                write(22,*) ( dados(i,:) )
+            else if(itmp == 3) then
+                write(23,*) ( dados(i,:) )
+            else if(itmp == 4) then
+                write(24,*) ( dados(i,:) )
+            else if(itmp == 5) then
+                write(25,*) ( dados(i,:) )
+            endif
+        enddo
+    endif
 
     ! Escrever em arquivo de teste os mínimos e máximos
-    write(15,*) " xMinimos: "
+    write(15,*) " xMinimos --- xMaximos : "
     do i = 1, numVariaveis
-        write(15,*) xMinimos(i) 
-    enddo
-    write(15,*) " xMaximos: "
-    do i = 1, numVariaveis
-        write(15,*) xMaximos(i)
+        write(15,*) xMinimos(i) , " --- ", xMaximos(i)
     enddo
  
 
