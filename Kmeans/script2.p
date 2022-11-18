@@ -1,14 +1,14 @@
 
 # Scale font and line width (dpi) by changing the size! It will always display stretched.
 set terminal png size 1920,1080 
-set output 'DeslocXtempo.png'
+set output 'GraficoGrupos_Inicial.png'
 
 
 # Key means label...
 
 
 set key inside bottom right
-set xlabel 'Tempo'
-set ylabel 'Deslocamento'
-set title 'Onda Elástica 1d'
-plot  "output" using 1:2 title 'Deslocamento' with p
+set xlabel 'X1'
+set ylabel 'X2'
+set title 'Conjunto inicial de pontos'
+plot  "dataset01.txt" using 1:2 title 'Deslocamento' w points pt 7 pointsize 4 lc rgb "blue" 
