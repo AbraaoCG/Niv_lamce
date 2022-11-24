@@ -27,12 +27,12 @@
     real*8  , allocatable   :: xMinimos(:), xMaximos(:)
     real*8  ,allocatable  ::  dados(:,:), centros(:,:),sumGroupXn(:,:)     ! dados(numPontos,numClusters)    
     
-    numGrupos=5
+    numGrupos=3
     numVariaveis=2
-    numPontos=100
+    numPontos=150
     
     allocate  ( agrupamento(1:numPontos))  ; agrupamento(:)  = 0.d0
-    allocate  ( numPontosGrupo(1:numGrupos)) 
+    allocate  ( numPontosGrupo(1:numGrupos)) ; numPontosGrupo(:) = 0.d0 
     allocate  ( dados(1:numPontos,1:numVariaveis))  ; dados(:,:)  = 0.d0
     allocate  ( centros(1:numGrupos,1:numVariaveis) )
     allocate  ( xMinimos(numVariaveis) ) ; xMinimos(:) = 2.d0 ! escolhe-se 2 e -1, pois o valores de todas características é normalizado entre 0 e 1.
@@ -41,8 +41,10 @@
     ! Body of Kmeans
     
     open  (unit=11,file='dataset01.txt',form='formatted')
-    open  (unit=13,file='agrupamento.txt',form='formatted')
+    
     open  (unit=15,file='test.txt',form='formatted')
+    open  (unit=17,file='centrosFinal.txt',form='formatted')
+    
     do i = 1,numPontos
     ! Ler dados, já encontrando mínimos e máximos dos pontos.
     read (11,*) (dados(i,j), j = 1,numVariaveis)
@@ -151,16 +153,24 @@
             enddo
         enddo
 
-        ! Atualização de centros.
+        ! Atualização de centros, caso haja algum ponto no grupo.
         do i = 1,numGrupos
+	    if (numPontosGrupo(i) .ne. 0) then
             do j = 1,numVariaveis
                 tmp = ( sumGroupXn(i,j) / numPontosGrupo(i) ) ! tmp armazena a nova coordenada para a variável j do grupo i.
                 centros(i,j) = tmp
             enddo
+	    endif
+	    ! Se o algoritimo for parar, posso registrar todos os centros finais.
+            if ( flag_mudanca == 0 ) then
+		write (17,*) centros(i,:)	        
+	    endif
         enddo
         
     enddo
     ! Abrir arquivos de saida de cada grupo.
+    open  (unit=13,file='agrupamento.txt',form='formatted')
+
     open  (unit=21,file='grupo1.txt',form='formatted')
     open  (unit=22,file='grupo2.txt',form='formatted')
     open  (unit=23,file='grupo3.txt',form='formatted')
@@ -168,8 +178,9 @@
     open  (unit=25,file='grupo5.txt',form='formatted')
     ! Registrar grupamentos finais gerar arquivos para plot de cada grupo.
     if (flag_mudanca == 0) then
+	write(13,'(A11)') "Ponto;Grupo"
         do i = 1,numPontos
-            write(13,*) "Ponto - Grupo : " , i , agrupamento(i)
+            write(13, fmt='(i4.4,A1,i4.4)') i - 1 ,";" ,agrupamento(i)
             itmp = agrupamento(i)
             if (itmp == 1) then
                 write(21,*) ( dados(i,:) )
