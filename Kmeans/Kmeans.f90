@@ -41,7 +41,7 @@
     ! Body of Kmeans
     
     open  (unit=11,file='dataset01.txt',form='formatted')
-    open  (unit=13,file='agrupamento.txt',form='formatted')
+    
     open  (unit=15,file='test.txt',form='formatted')
     open  (unit=17,file='centrosFinal.txt',form='formatted')
     
@@ -169,6 +169,8 @@
         
     enddo
     ! Abrir arquivos de saida de cada grupo.
+    open  (unit=13,file='agrupamento.txt',form='formatted')
+
     open  (unit=21,file='grupo1.txt',form='formatted')
     open  (unit=22,file='grupo2.txt',form='formatted')
     open  (unit=23,file='grupo3.txt',form='formatted')
@@ -176,9 +178,9 @@
     open  (unit=25,file='grupo5.txt',form='formatted')
     ! Registrar grupamentos finais gerar arquivos para plot de cada grupo.
     if (flag_mudanca == 0) then
-	write(13,*)"Ponto" , "Grupo"
+	write(13,'(A11)') "Ponto;Grupo"
         do i = 1,numPontos
-            write(13, *) i, agrupamento(i)
+            write(13, fmt='(i4.4,A1,i4.4)') i - 1 ,";" ,agrupamento(i)
             itmp = agrupamento(i)
             if (itmp == 1) then
                 write(21,*) ( dados(i,:) )
