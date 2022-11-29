@@ -6,7 +6,8 @@ set output 'GraficoGrupos.png'
 
 # Key means label...
 
-
+set xrange [0.5:1];
+set yrange [0.4:1];
 
 set key inside bottom right
 set pointsize 10
