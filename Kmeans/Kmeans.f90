@@ -36,8 +36,8 @@
     allocate  ( dados(1:numPontos,1:numVariaveis))  ; dados(:,:)  = 0.d0
     allocate  ( dados_norm(1:numPontos,1:numVariaveis))  ; dados_norm(:,:)  = 0.d0
     allocate  ( centros(1:numGrupos,1:numVariaveis) )
-    allocate  ( xMinimos(numVariaveis) ) ; xMinimos(:) = 100000.d0 ! escolhe-se 2 e -1, pois o valores de todas características é normalizado entre 0 e 1.
-    allocate  ( xMaximos(numVariaveis) ) ; xMaximos(:) = -10000.d0
+    allocate  ( xMinimos(numVariaveis) ) ; xMinimos(:) = 1.0e15 ! escolhe-se 2 e -1, pois o valores de todas características é normalizado entre 0 e 1.
+    allocate  ( xMaximos(numVariaveis) ) ; xMaximos(:) = -1.0e15
     allocate  ( xMaximos_base(numVariaveis) ) ;
     allocate  ( sumGroupXn(1:numGrupos,1:numVariaveis))  ; sumGroupXn(:,:)  = 0.d0
     ! Body of Kmeans
@@ -69,7 +69,7 @@
     enddo
     
     ! Encontrar máximos e minimos normalizados
-    xMinimos(:) = 100000.d0 ; xMaximos(:) = 1.d0
+    xMinimos(:) = 1.0e15 ; xMaximos(:) = 1.d0
 
     do i = 1,numPontos
         do j = 1, numVariaveis
@@ -129,13 +129,13 @@
             endif
         enddo
     endif
-    
     !centros(1,1) = 0 ; centros(1,2) = 0 
     !centros(2,1) = 0.5 ; centros(2,2) = 0.5
     !centros(3,1) = 1 ; centros(3,2) = 1
 
     flag_mudanca = -1
     do while(flag_mudanca .ne. 0)
+
         flag_mudanca = 0
         !Reinicializo Vetores auxiliares de cálculo de baricentro.
         sumGroupXn(:,:)  = 0.d0 
@@ -149,7 +149,7 @@
         ! Iteração para obter distancias entre cada ponto e cada centro de grupo, visando classificar os pontos nos grupos.
         do i = 1,numPontos
             itmp = agrupamento(i) ! Armazeno agrupamento do ponto i antes da atualização.
-            menorDist = 2
+            menorDist = 1.0e15
             do j = 1,numGrupos
                 somaQuadrados = 0.0
                 do k = 1, numVariaveis ! Loop auxiliar para cálculo de distância euclidiana no R(numGrupos).
@@ -231,5 +231,5 @@
     enddo
  
 
-   pause 
+    
     end program Kmeans
