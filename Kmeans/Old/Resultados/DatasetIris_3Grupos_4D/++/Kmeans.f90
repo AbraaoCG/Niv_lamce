@@ -1,21 +1,18 @@
-    program ElbowAlg
-    
-    integer ::  numGrupos
-    real*8 :: WCSS
-    
-    numGrupos = 2
-    
-    do 2, numPontos - 1
-    CALL Kmeans(numGrupos, WCSS)
-    print *, WCSS
+!  Kmeans.f90 
+!
+!  FUNCTIONS:
+!  Kmeans - Entry point of console application.
+!
 
-    end program ElbowAlg
-    
-    
+!****************************************************************************
+!
+!  PROGRAM: Kmeans
+!
+!  PURPOSE:  Entry point for the console application.
+!
+!****************************************************************************
 
-
-
-    SUBROUTINE Kmeans( numGrupos , WCSS )
+    program Kmeans
 
     implicit none
 
@@ -26,13 +23,13 @@
     integer ::  numGrupos,numVariaveis, numPontos,flag_mudanca, itmp
     integer :: i,j,k ! Iteradores
     integer, allocatable :: agrupamento(:),numPontosGrupo(:)
-    real*8 :: somaQuadrados,tmp,menorDist, distanciaPC, WCSS
+    real*8 :: somaQuadrados,tmp,menorDist, distanciaPC
     real*8  , allocatable   :: xMinimos(:), xMaximos(:) , xMaximos_base(:)
     real*8  ,allocatable  ::  dados(:,:), centros(:,:),sumGroupXn(:,:), dados_norm(:,:)     ! dados(numPontos,numClusters)    
     
-    !numGrupos=3
+    numGrupos=3
     numVariaveis=2
-    numPontos=130
+    numPontos=150
     
     allocate  ( agrupamento(1:numPontos))  ; agrupamento(:)  = 0.d0
     allocate  ( numPontosGrupo(1:numGrupos)) ; numPontosGrupo(:) = 0.d0 
@@ -72,7 +69,7 @@
     enddo
     
     ! Encontrar máximos e minimos normalizados
-    xMinimos(:) = 1.0e15 ; xMaximos(:) = 1.d0
+    xMinimos(:) = 100000.d0 ; xMaximos(:) = 1.d0
 
     do i = 1,numPontos
         do j = 1, numVariaveis
@@ -139,7 +136,6 @@
 
     flag_mudanca = -1
     do while(flag_mudanca .ne. 0)
-        WCSS = 0
         flag_mudanca = 0
         !Reinicializo Vetores auxiliares de cálculo de baricentro.
         sumGroupXn(:,:)  = 0.d0 
@@ -153,7 +149,7 @@
         ! Iteração para obter distancias entre cada ponto e cada centro de grupo, visando classificar os pontos nos grupos.
         do i = 1,numPontos
             itmp = agrupamento(i) ! Armazeno agrupamento do ponto i antes da atualização.
-            menorDist = 1.0e15
+            menorDist = 2
             do j = 1,numGrupos
                 somaQuadrados = 0.0
                 do k = 1, numVariaveis ! Loop auxiliar para cálculo de distância euclidiana no R(numGrupos).
@@ -167,10 +163,6 @@
                 if ( distanciaPC < menorDist ) then
                     menorDist = distanciaPC
                     agrupamento(i) = j
-                endif
-                ! Atualizo a soma dos quadrados sempre com as menores distâncias.
-                if (j == numGrupos) then
-                    WCSS = WCSS + ( menorDist ** 2 )
                 endif
             enddo
             numPontosGrupo( agrupamento(i) ) = numPontosGrupo( agrupamento(i) ) + 1 ! Mantenho rastreio do número de pontos de cada grupo ao final do algorítimo
@@ -237,7 +229,7 @@
     do i = 1, numVariaveis
         write(15,*) xMinimos(i) , " --- ", xMaximos(i)
     enddo
-    
+ 
 
-
-    end SUBROUTINE Kmeans
+   pause 
+    end program Kmeans

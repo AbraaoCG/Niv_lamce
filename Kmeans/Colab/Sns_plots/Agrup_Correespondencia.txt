@@ -1,0 +1,4 @@
+	Agrupam_correspondencia
+setosa	1
+versicolor	2
+virginica	0
