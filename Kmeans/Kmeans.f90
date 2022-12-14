@@ -20,7 +20,7 @@
     ! Flag Mudanca será usada para indicar se o algorítimo estabilizou em uma ordem de grupos.
     ! itmp é uma variável para armazenar localmente um inteiro.
     ! numPontosGrupo é um vetor para armazenar o número de pontos contido em cada grupo.( para calculo de baricentro.)
-    integer ::  numGrupos,numVariaveis, numPontos,flag_mudanca, itmp , contadorErros
+    integer ::  numGrupos,numVariaveis, numPontos,flag_mudanca, itmp , contadorErros , seAgrupado
     integer :: i,j,k ! Iteradores
     integer, allocatable :: agrupamento(:), agrupamento_org_treino(:) ,numPontosGrupo(:)
     integer, allocatable :: indexTreino(:) , correspondencia_centros(:) , erros(:)
@@ -30,9 +30,11 @@
     character*20, allocatable  :: header(:), groupNames(:)
     character*20 :: ctmp
     
-    numGrupos=3
-    numVariaveis=3
-    numPontos=135
+    open(unit=19, file = 'args.txt')
+    read (19, '(A10 , i4.4)') ctmp , numGrupos
+    read (19, '(A7 , i4.4)') ctmp , numVariaveis
+    read (19, '(A16 , i4.4)') ctmp , numPontos
+    read (19, '(A18 , i4.4)') ctmp , seAgrupado
 
     allocate  ( erros(1:numPontos))  ; erros(:)  = -1.d0 ! Lista de erros inicializa com -1, pontos com valor diferente de 1 nesse Array foram classificados errado pelo algorítimo.
     allocate  ( agrupamento(1:numPontos))  ; agrupamento(:)  = 0.d0 
@@ -59,8 +61,8 @@
     
     ! Body of Kmeans
     
-    open  (unit=11,file='Datasets/dataset_treino.txt',form='formatted')
-    open  (unit=12,file='Datasets/dataset_teste.txt',form='formatted')
+    open  (unit=11,file='dataSets/dataset_treino.txt',form='formatted')
+    open  (unit=12,file='dataSets/dataset_teste.txt',form='formatted')
     open  (unit=15,file='Resultado_Plot/test.txt',form='formatted')
     open  (unit=17,file='Resultado_Plot/centrosTreino.txt',form='formatted')
 
@@ -82,6 +84,7 @@
             endif
         enddo
     enddo
+ 
     xMaximos_base = xMaximos
     
     ! Após encontrar máximos e mínimos, normalizar todos os pontos
@@ -219,52 +222,55 @@
         enddo
         
     enddo
-    ! Leitura do centroide Original.
-    open(19, file = 'Resultado_Plot/Centroide_Original.txt', form = 'formatted')
-    do i = 1,numGrupos
-        read(19, *) groupNames(i), centros_original(i,:)
-    enddo
-    ! Calculo de correspondencia entre centroide Treino e centroide original. 
-    do i = 1,numGrupos ! i --> index centroide de treino ( centros(:,:) )
-        menorDist = 1.0e15
-        do j = 1,numGrupos ! j --> index centroide original ( centros_original(:,:) )
-            ! Verifico com qual centro original 'j' o centro de treino 'i' é mais compatível
-            somaQuadrados = 0.0
-            do k = 1, numVariaveis ! Loop auxiliar para cálculo de distância euclidiana no R(numGrupos).
-                tmp = 0
-                tmp = centros_original(i,k) - centros(j,k) ! tmp recebe a diferenca entre o centro e o ponto.
-                somaQuadrados = somaQuadrados + (tmp ** 2)  
-            enddo
-            distanciaPC = sqrt(somaQuadrados)
-            write(15,*) i , j , distanciaPC
-            ! Vejo se preciso atualizar Grupo do ponto analisado
-            if ( distanciaPC < menorDist ) then
-                menorDist = distanciaPC
-                correspondencia_centros(i) = j - 1 ! Ouput do python para agrupamento é de 0 --> m ( m = número de grupos)
-            endif
+    ! Leitura do centroide Original para cálculo de correspondencia e erro, caso o dataSet seja pré agrupado.
+    if (seAgrupado .eq. 1) then
+        open(19, file = 'Resultado_Plot/Centroide_Original.txt', form = 'formatted')
+        do i = 1,numGrupos
+            read(19, *) groupNames(i), centros_original(i,:)
         enddo
-        write(15,*) correspondencia_centros(i) 
-    enddo
-    ! Cálculo de erro entre treino e classificação especialista.
-    open(20, file = 'agrupamentoOriginal/agrup_original_treino.txt' , form = 'formatted')
-    open(31 , file = 'Resultado_Plot/erros.txt', form= 'formatted')
-    read(20,*) ctmp ! Le nome do tipo de grupo (nome coluna).
-    read(20,'(i4.3)') ( agrupamento_org_treino(i) , i = 1, numPontos )
+        ! Calculo de correspondencia entre centroide Treino e centroide original. 
+        do i = 1,numGrupos ! i --> index centroide de treino ( centros(:,:) )
+            menorDist = 1.0e15
+            do j = 1,numGrupos ! j --> index centroide original ( centros_original(:,:) )
+                ! Verifico com qual centro original 'j' o centro de treino 'i' é mais compatível
+                somaQuadrados = 0.0
+                do k = 1, numVariaveis ! Loop auxiliar para cálculo de distância euclidiana no R(numGrupos).
+                    tmp = 0
+                    tmp = centros_original(i,k) - centros(j,k) ! tmp recebe a diferenca entre o centro e o ponto.
+                    somaQuadrados = somaQuadrados + (tmp ** 2)  
+                enddo
+                distanciaPC = sqrt(somaQuadrados)
+                write(15,*) i , j , distanciaPC
+                ! Vejo se preciso atualizar Grupo do ponto analisado
+                if ( distanciaPC < menorDist ) then
+                    menorDist = distanciaPC
+                    correspondencia_centros(i) = j - 1 ! Ouput do python para agrupamento é de 0 --> m ( m = número de grupos)
+                endif
+            enddo
+            write(15,*) correspondencia_centros(i) 
+        enddo
+        ! Cálculo de erro entre treino e classificação especialista.
+        open(20, file = 'agrupamentoOriginal/agrup_original_treino.txt' , form = 'formatted')
+        open(31 , file = 'Resultado_Plot/erros.txt', form= 'formatted')
+        read(20,*) ctmp ! Le nome do tipo de grupo (nome coluna).
+        read(20,'(i4.3)') ( agrupamento_org_treino(i) , i = 1, numPontos )
 
-
-    ! indexTreino
-    write(31,'(100A)') ( header(i) , i = 1,numVariaveis ) ! OBS : Aqui permite até 100 variáveis.
-    contadorErros = 0
-    do i = 1,numPontos ! i --> index do ponto 'i' de treino, a ser avaliado.
-        if ( correspondencia_centros(agrupamento(i)) .ne. agrupamento_org_treino(i) ) then 
-            erros(i) = indexTreino(i)
-            contadorErros = contadorErros + 1   
-            write(31,*) dados(i,:)
-        endif
-    enddo!agrupamento_org_treino
-    tmp = ( real( contadorErros) ) / (real(numPontos)) 
-    print *, tmp
-    print ('(A22 , i4.4 , A3 , i4.4 , A3 , F8.4)'), "O erro de treino é : " , contadorErros , " / " , numPontos , " = " , tmp 
+        ! indexTreino
+        write(31,'(100A)') ( header(i) , i = 1,numVariaveis ) ! OBS : Aqui permite até 100 variáveis.
+        contadorErros = 0
+        do i = 1,numPontos ! i --> index do ponto 'i' de treino, a ser avaliado.
+            if ( correspondencia_centros(agrupamento(i)) .ne. agrupamento_org_treino(i) ) then 
+                erros(i) = indexTreino(i)
+                contadorErros = contadorErros + 1   
+                write(31,*) dados(i,:)
+            endif
+        enddo!agrupamento_org_treino
+        tmp = ( real( contadorErros) ) / (real(numPontos)) 
+        print *, tmp
+        print ('(A22 , i4.4 , A3 , i4.4 , A3 , F8.4)'), "O erro de treino é : " , contadorErros , " / " , numPontos , " = " , tmp 
+    else
+        print *, " Não é possível calcular erro de treino, pois o dataSet não é previamente agrupado."
+    endif
     
     
     ! Abrir arquivos de saida de cada grupo.
@@ -299,6 +305,8 @@
     do i = 1, numVariaveis
         write(15,*) xMinimos(i) , " --- ", xMaximos(i)
     enddo
+
+    print *, achar(10) , " Classificação executada com sucesso, verifique output em Resultado_Plot"
  
 
     

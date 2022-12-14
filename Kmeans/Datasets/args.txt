@@ -1,0 +1,4 @@
+NumGrupos	3
+numVar	3
+numLinhasTreino	135
+DadosPreAgrupados	1
