@@ -12,10 +12,10 @@ Original file is located at
 # libraries
 from sklearn import cluster
 import numpy as np
-
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+import os as os
 
 # -------------------------------------------------------------------------------------------
 
@@ -26,14 +26,20 @@ import seaborn as sns
 # Características utilizadas na classificação.
 # Se os dados devem ser lidos ou importados do Seaborn
 # Se os dados já estão agrupados ou não ( se não, não há como calcular erro)
+# Nome do arquivo de entrada.
 
-PorcentTeste = 10
-numGrupos = 3
-legenda_agrupamento = 'species'
-selected_var = ['sepal_width', 'petal_length', 'petal_width']
-dataRead = False
+PorcentTeste = 0
+numGrupos = 2
+legenda_agrupamento = 'Heart Disease'  # 'species'
+selected_var = ['Max HR', 'Age', 'Chest pain type', 'Cholesterol',
+                'ST depression', 'Slope of ST']  # ['sepal_width', 'petal_length', 'petal_width']
+
+#selected_var = ['BP', 'Cholesterol', 'Max HR', 'ST depression', 'Slope of ST']
+#selected_var = ['Cholesterol']
+dataRead = True
 dataClustered = 1
 
+fileName = 'Heart_Disease_Prediction.txt'
 # -------------------------------------------------------------------------------------------
 
 # Leitura de dados
@@ -41,8 +47,14 @@ sns.set()
 if (dataRead == False):
     data = sns.load_dataset("iris")
 else:
-    data = pd.read_csv(data='dataRaw.csv', sep='\t', )
+    separator = ','
+    data = pd.read_csv(fileName, sep=separator)
 
+# Possibilidade de printar correlação
+plotCorrelation = False
+if (plotCorrelation):
+    sns.pairplot(data, hue=legenda_agrupamento)
+    plt.savefig('dataSets/Tabela_Correlação.png')
 
 # Defino tamanho do teste
 tamData = len(data)
@@ -67,6 +79,16 @@ if (dataClustered == 1):
     data = data[selected_var + [legenda_agrupamento]]
 else:
     data = data[selected_var]
+
+# # Tratar nome de colunas ( retirando espaços )
+columns_old = data.columns
+columns_new = []
+for column in columns_old:
+    columns_new.append(column.replace(' ', '_'))
+    if (column == legenda_agrupamento):
+        legenda_agrupamento = column.replace(' ', '_')
+data.columns = columns_new
+
 # Obtenho Linha de indexes randômicos.
 all_index = data.index.values.tolist()
 random_Test_indexes = getRandomIndexes(all_index, numLinTeste)
@@ -124,7 +146,6 @@ if (dataClustered == 1):
                 Centroide_original['numObjetos'][group]
 
     # Substituir nomes de grupos por numeração do centroide original ( preparação para usar esses dados de agrupamento original no código de fortran).
-    print(Centroide_original.index.values[0])
 
     for numeracao in range(len(Centroide_original.index.values)):
         for nameGroup in Agrupamento_original_treino:
@@ -171,3 +192,11 @@ data_Treino.to_csv('dataSets/dataset_treino.txt', sep='\t',
 
 data_Teste.to_csv('dataSets/dataset_teste.txt',
                   sep='\t', index=True, header=True)
+
+# Deleçao de arquivos de agrupamento anteriores.
+
+os.remove('Resultado_Plot/grupo1.txt')
+os.remove('Resultado_Plot/grupo2.txt')
+os.remove('Resultado_Plot/grupo3.txt')
+os.remove('Resultado_Plot/grupo4.txt')
+os.remove('Resultado_Plot/grupo5.txt')

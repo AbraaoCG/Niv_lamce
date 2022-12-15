@@ -16,7 +16,7 @@
 
     implicit none
     
-    integer ::  neqmax ; parameter (neqmax=300)
+    integer ::  neqmax ; parameter (neqmax=2000)
     integer :: i, nume, numnp, neq, nsteps,  kn=100, iopt
     real*8  :: xL, rho, fi, fj, ui, uj, vi, vj, ai, aj, time, dt, area, Eyoung
     real*8  :: xk11, xk12, xk22, xM11, xM12, xM22, timetot, xLe
@@ -31,7 +31,7 @@
     numnp  = nume+1
     
     timetot= 10.0d0
-    dt     = 2.0d-5
+    dt     = 2.0d-4
     
     nsteps = int(timetot/dt)
     
@@ -171,7 +171,7 @@
           
           
     elseif (iopt .eq. 1) then 
-    
+          
           open  (unit=55,file='Results2.txt',form='formatted')
           ! Begin Newmark-Implicit
           do i = 1 , nsteps   
@@ -200,7 +200,7 @@
               
               if (MOD(i-1,kn) .EQ. 0) then 
                  write(55,*) time, disp(neq,1), vel(neq,1)  ! ,';'  aqui
-                 !call plotdisp(vel,neq,time,i,kn)
+                 call plotdisp(vel,neq,time,i,kn)
               endif
                  
               
