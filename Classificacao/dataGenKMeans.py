@@ -30,13 +30,13 @@ import os as os
 
 PorcentTeste = 0
 numGrupos = 2
-legenda_agrupamento = 'Heart Disease'  # 'species'
-selected_var = ['Max HR', 'Age', 'Chest pain type', 'Cholesterol',
-                'ST depression', 'Slope of ST']  # ['sepal_width', 'petal_length', 'petal_width']
+legenda_agrupamento =  'species' #'Heart Disease' 
+selected_var =  ['sepal_width', 'petal_length', 'petal_width'] #['Max HR', 'Age', 'Chest pain type', 'Cholesterol',
+                #'ST depression', 'Slope of ST']  #
 
 #selected_var = ['BP', 'Cholesterol', 'Max HR', 'ST depression', 'Slope of ST']
 #selected_var = ['Cholesterol']
-dataRead = True
+dataRead = False
 dataClustered = 1
 
 fileName = 'dataSets/Heart_Disease_Prediction.txt'

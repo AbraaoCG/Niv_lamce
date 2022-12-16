@@ -14,6 +14,6 @@ program KNNeighbors
     read (19, '(A16 , i4.4)') ctmp , numPontos
     read (19, '(A16 , i4.4)') ctmp , numNeighbors
     
-
+    
 
 end program
