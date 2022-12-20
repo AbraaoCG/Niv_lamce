@@ -28,7 +28,7 @@ import os as os
 # Se os dados já estão agrupados ou não ( se não, não há como calcular erro)
 # Nome do arquivo de entrada.
 
-PorcentTeste = 0
+PorcentTeste = 10
 numVizinhos_porcent = 5  # Número de vizinhos em % do dataSet
 
 legenda_agrupamento = 'Heart Disease'  # 'species'
@@ -53,7 +53,8 @@ else:
 # Leitura do número de
 
 numVizinhos = len(data) * (numVizinhos_porcent / 100)
-numGrupos = data
+print ( "Número de vizinhos que serão considerados pelo algorítimo = " , numVizinhos)
+
 
 # Possibilidade de printar correlação
 plotCorrelation = False
@@ -116,69 +117,21 @@ print(data_Treino.index.values)
 
 """
 
-# Cálculo de centroide original para cálculo de erro caso haja agrupamento original.
-
-num_grupos_dataset = numGrupos
-# Obtenho lista com nomes de cada tipo de objeto / label.
-group_labels = data[legenda_agrupamento].unique()
-
-# Crio dataset para centroide original
-Centroide_original = pd.DataFrame(
-    columns=data_Teste.columns, index=group_labels)
-Centroide_original.fillna(0.0, inplace=True)
-
-# Calculando centroides do dataset original com classificação original (de especialista) ( Faz-se aqui apenas a soma dos valores encontrados, posteriormente a média)
-for item in data.index.values:  # Percorre index de todos os objetos.
-    for group in group_labels:       # percorre nome dos grupos
-        if (data[legenda_agrupamento][item] == group):
-            # percorre nome das variáveis que dão dimensão à classificação.
-            for dimension in data_Teste:
-                Centroide_original[dimension][group] += data[dimension][item]
-
-# determinar número de objetos em cada grupo no Dataset Original.
-agrup_original = data[legenda_agrupamento].to_numpy()
-num_objetos_original = pd.value_counts(agrup_original)
-Centroide_original = pd.concat([Centroide_original, pd.DataFrame(
-    {'numObjetos': num_objetos_original})], axis=1)
-
-# Cálculo da média de cada variável, divindo pelo número de objetos classificados em cada grupo.
-for group in group_labels:
-    for dimension in data_Teste:
-        Centroide_original[dimension][group] = Centroide_original[dimension][group] / \
-            Centroide_original['numObjetos'][group]
-
-# Substituir nomes de grupos por numeração do centroide original ( preparação para usar esses dados de agrupamento original no código de fortran).
-
-for numeracao in range(len(Centroide_original.index.values)):
-    for nameGroup in Agrupamento_original_treino:
-        Agrupamento_original_treino.replace(
-            Centroide_original.index.values[numeracao], numeracao, inplace=True)
-    for nameGroup in Agrupamento_original_teste:
-        Agrupamento_original_teste.replace(
-            Centroide_original.index.values[numeracao], numeracao, inplace=True)
-
-# Escrever em txt as informações do centroide e agrupamento original.
-Centroide_original.index.names = ['index']
-
 Agrupamento_original_treino.to_csv(
     'agrupamentoOriginal/agrup_original_treino.txt', sep='\t', index=False, header=True)
 
 Agrupamento_original_teste.to_csv(
     'agrupamentoOriginal/agrup_original_teste.txt', sep='\t', index=False, header=True)
 
-Centroide_original.drop(['numObjetos'], axis=1).to_csv(
-    'Resultado_PlotKnn/Centroide_Original.txt', sep='\t', index=True, header=False)
-
-
 # Adicionar nome à coluna de indexes:
 data_Treino.index.names = ['index']
 data_Teste.index.names = ['index']
 
 # Gerar tabela com argumentos
-args = [numGrupos, len(selected_var), (tamData - numLinTeste), numVizinhos]
+args = [len(selected_var), (tamData - numLinTeste), numVizinhos]
 
 args = pd.DataFrame({'argumentosKMeans': args}, index=[
-                    'NumGrupos', 'numVar', 'numLinhasTreino', 'numVizinhos'])
+                    'numVar', 'numLinhasTreino', 'numVizinhos'])
 
 # Objetivo : gerar: arquivo com argumentos K Means; datasets completo; dataset treino; agrupamento original treino; dataset teste.
 
@@ -197,8 +150,14 @@ data_Teste.to_csv('dataSets/dataset_testeKnn.txt',
 
 # Deleçao de arquivos de agrupamento anteriores.
 
-os.remove('Resultado_PlotKnn/grupo1.txt')
-os.remove('Resultado_PlotKnn/grupo2.txt')
-os.remove('Resultado_PlotKnn/grupo3.txt')
-os.remove('Resultado_PlotKnn/grupo4.txt')
-os.remove('Resultado_PlotKnn/grupo5.txt')
+
+if (os.path.exists('Resultado_PlotKnn/grupo1.txt')):
+	os.remove('Resultado_PlotKnn/grupo1.txt')
+if (os.path.exists('Resultado_PlotKnn/grupo2.txt')):
+	os.remove('Resultado_PlotKnn/grupo2.txt')
+if (os.path.exists('Resultado_PlotKnn/grupo3.txt')):
+	os.remove('Resultado_PlotKnn/grupo3.txt')
+if (os.path.exists('Resultado_PlotKnn/grupo4.txt')):
+	os.remove('Resultado_PlotKnn/grupo4.txt')
+if (os.path.exists('Resultado_PlotKnn/grupo5.txt')):
+	os.remove('Resultado_PlotKnn/grupo5.txt')
