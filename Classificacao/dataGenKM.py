@@ -50,6 +50,8 @@ else:
     separator = ','
     data = pd.read_csv(fileName, sep=separator)
 
+data.to_csv('dataIris.txt',sep='\t', index=False)
+
 # Possibilidade de printar correlação
 plotCorrelation = False
 if (plotCorrelation):

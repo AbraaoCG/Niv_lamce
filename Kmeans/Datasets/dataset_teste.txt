@@ -1,1 +1,0 @@
-index	Max_HR	Age	Chest_pain_type	Cholesterol	ST_depression	Slope_of_ST
